@@ -252,6 +252,32 @@ type RegistrationDriver struct {
 	// Contain the details required for registering with hub cluster (ie: an EKS cluster) using AWS IAM roles for service account.
 	// This is required only when the authType is awsirsa.
 	AwsIrsa *AwsIrsa `json:"awsIrsa,omitempty"`
+
+	// spiffe makes the agents obtain SPIFFE identities from the hub with their
+	// own projected ServiceAccount tokens. It requires authType grpc. No
+	// bootstrap or hub kubeconfig Secret is used.
+	// +optional
+	SPIFFE *SPIFFEAgentConfig `json:"spiffe,omitempty"`
+}
+
+// SPIFFEAgentConfig configures SPIFFE identities for the klusterlet agents.
+type SPIFFEAgentConfig struct {
+	// grpcServerAddress is the hub gRPC server's host:port.
+	// +required
+	// +kubebuilder:validation:MinLength=1
+	GRPCServerAddress string `json:"grpcServerAddress"`
+
+	// trustDomain is the hub's SPIFFE trust domain. The agents accept only a
+	// hub presenting spiffe://{trustDomain}/ocm/hub/grpc-server.
+	// +required
+	// +kubebuilder:validation:Pattern=`^[a-z0-9._-]+$`
+	TrustDomain string `json:"trustDomain"`
+
+	// tokenAudience is the hub's token audience, requested on the agents'
+	// projected tokens.
+	// +required
+	// +kubebuilder:validation:MinLength=1
+	TokenAudience string `json:"tokenAudience"`
 }
 
 type AwsIrsa struct {

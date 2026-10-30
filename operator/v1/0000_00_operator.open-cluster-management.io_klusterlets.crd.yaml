@@ -458,6 +458,33 @@ spec:
                         - hubClusterArn
                         - managedClusterArn
                         type: object
+                      spiffe:
+                        description: |-
+                          spiffe makes the agents obtain SPIFFE identities from the hub with their
+                          own projected ServiceAccount tokens. It requires authType grpc. No
+                          bootstrap or hub kubeconfig Secret is used.
+                        properties:
+                          grpcServerAddress:
+                            description: grpcServerAddress is the hub gRPC server's host:port.
+                            minLength: 1
+                            type: string
+                          tokenAudience:
+                            description: |-
+                              tokenAudience is the hub's token audience, requested on the agents'
+                              projected tokens.
+                            minLength: 1
+                            type: string
+                          trustDomain:
+                            description: |-
+                              trustDomain is the hub's SPIFFE trust domain. The agents accept only a
+                              hub presenting spiffe://{trustDomain}/ocm/hub/grpc-server.
+                            pattern: ^[a-z0-9._-]+$
+                            type: string
+                        required:
+                        - grpcServerAddress
+                        - tokenAudience
+                        - trustDomain
+                        type: object
                     required:
                     - authType
                     type: object
