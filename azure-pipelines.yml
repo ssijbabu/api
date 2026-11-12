@@ -1,0 +1,41 @@
+# Azure DevOps CI for open-cluster-management.io/api.
+# Mirrors .github/workflows/go.yml: verify, verify-deps, build, unit and integration tests.
+
+trigger:
+  branches:
+    include:
+    - main
+    - release-*
+    - azure-*
+
+pr:
+  branches:
+    include:
+    - main
+    - release-*
+
+stages:
+- stage: ci
+  displayName: CI
+  jobs:
+  - template: .azure-pipelines/templates/make-jobs.yml
+    parameters:
+      # The codegen scripts behind `make verify` expect the repo inside a GOPATH layout.
+      checkoutPath: go/src/open-cluster-management.io/api
+      goPath: $(Agent.BuildDirectory)/go
+      checks:
+      - name: verify
+        displayName: verify
+        commands: [make verify]
+      - name: verify_deps
+        displayName: verify-deps
+        commands: [make verify-deps]
+      - name: build
+        displayName: build
+        commands: [make build]
+      - name: unit
+        displayName: unit
+        commands: [make test]
+      - name: integration
+        displayName: integration
+        commands: [make test-api-integration]
